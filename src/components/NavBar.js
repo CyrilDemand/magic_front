@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 
 const NavBar = ({ setShowCharacters }) => {
     return (
-        <AppBar position="static" color="transparent" elevation={0}>
+        <AppBar position="static" color="transparent" elevation={0} id={"navbar"}>
             <Toolbar>
                 <Button component={Link} color="inherit" onClick={() => setShowCharacters(true)} to={"/"}>
                     Personnages</Button>

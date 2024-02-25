@@ -13,7 +13,6 @@ code {
 }
 
 #home_page {
-  display: flex;
   height: 100vh;
   color: white;
   width: 70%;

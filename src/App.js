@@ -1,5 +1,5 @@
 import Form from "./pages/Form";
-import { Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import FormCompetence from "./pages/FormCompetence";
 import {useEffect, useState} from "react";
@@ -7,7 +7,7 @@ import {fetchCharacters} from "./api/charactersApi";
 import {fetchSkills} from "./api/skillsApi";
 import {useDispatch} from "react-redux";
 import Header from "./components/Header";
-
+import "./App.css";
 function App() {
 
     const dispatch = useDispatch();

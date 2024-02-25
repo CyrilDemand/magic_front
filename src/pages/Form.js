@@ -1,22 +1,31 @@
-import React, {useEffect, useState, forwardRef} from 'react';
-import axios from 'axios';
-import '../resources/css/form.css';
-import {Toaster} from "react-hot-toast";
+import React, { useEffect, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-import {handleRang} from "../features/characters/charactersFunctions";
-import {characterModel} from "../features/characters/characterModel";
-import {addCharacter} from "../api/charactersApi";
-import {useDispatch, useSelector} from "react-redux";
-import {selectCharacterById} from "../features/characters/charactersSlice";
-import {getSkillsName} from "../features/skills/skillsSlice";
+import { handleRang } from '../features/characters/charactersFunctions';
+import { characterModel } from '../features/characters/characterModel';
+import { addCharacter } from '../api/charactersApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCharacterById } from '../features/characters/charactersSlice';
+import { getSkillsName } from '../features/skills/skillsSlice';
+import {
+    TextField,
+    Button,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Grid,
+} from '@mui/material';
 
 const Form = () => {
     const [title, setTitle] = useState('Ajouter Personnage');
     const [personnage, setPersonnage] = useState(characterModel);
     const dispatch = useDispatch();
     const { id } = useParams();
-    const character = useSelector(state => id ? selectCharacterById(state, id) : undefined);
-    const skillsNameList = useSelector(state => getSkillsName(state));
+    const character = useSelector((state) =>
+        id ? selectCharacterById(state, id) : undefined
+    );
+    const skillsNameList = useSelector((state) => getSkillsName(state));
 
     const handleChangeAttribut = (e) => {
         const { name, value } = e.target;
@@ -50,26 +59,28 @@ const Form = () => {
             },
         });
     };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        // Mise à jour de l'état directement pour tous les champs sauf quantiteMana pour lequel on calcule aussi le rang
         if (name === 'quantiteMana') {
-            // Pour quantiteMana, on met à jour la valeur directement ici
-            setPersonnage(prevState => ({
+            setPersonnage((prevState) => ({
                 ...prevState,
                 quantiteMana: parseInt(value, 10),
+                rang: handleRang(value),
             }));
-        }
-        else if (['autresPrenoms', 'autresNoms', 'titres', 'benedictions', 'maledictions'].includes(name)) {
+        } else if (
+            ['autresPrenoms', 'autresNoms', 'titres', 'benedictions', 'maledictions'].includes(
+                name
+            )
+        ) {
             setPersonnage({ ...personnage, [name]: value.split(',') });
         } else {
             setPersonnage({ ...personnage, [name]: value });
         }
     };
 
-
     useEffect(() => {
-        setPersonnage(prevState => ({
+        setPersonnage((prevState) => ({
             ...prevState,
             rang: handleRang(prevState),
         }));
@@ -80,97 +91,354 @@ const Form = () => {
             setPersonnage(characterModel); // Réinitialise le formulaire si aucun ID ou personnage non trouvé
             setTitle('Ajouter Personnage');
         }
-    },  [id, character]);
+    }, [id, character]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         dispatch(addCharacter(personnage));
     };
 
-    const tabToString = (tab) => {
-        return tab.join(',');
-    }
-
     return (
         <form>
             <h1>{title}</h1>
-            <div><Toaster
-                position="top-center"
-                reverseOrder={false}
-            /></div>
-            <input type="text" name="prenom" placeholder="Prénom" onChange={handleChange} value={personnage.prenom}/>
-            <input type="text" name="nom" placeholder="Nom" onChange={handleChange} value={personnage.nom}/>
-
-            <input type="text" name="autresPrenoms" placeholder="Autres Prénoms"  onChange={handleChange} value={tabToString(personnage.autresPrenoms)}/>
-            <input type="text" name="autresNoms" placeholder="Autres Noms" onChange={handleChange} value={tabToString(personnage.autresNoms)}/>
-
-            <input type="text" name="alias" placeholder="Alias" onChange={handleChange} value={personnage.alias}/>
-
-            {
-                // le .slice(0, 10) permet de ne récupérer que la date sans l'heure "2002-06-02T00:00:00.000Z" => "2002-06-02"
-            }
-            <input type="date" name="anniversaire" placeholder="Anniversaire" onChange={handleChange} value={personnage.anniversaire.slice(0, 10) }/>
-
-            <select name="sexe" onChange={handleChange} value={personnage.sexe}>
-                <option value="">Sélectionnez le Sexe</option>
-                <option value="H">Homme</option>
-                <option value="F">Femme</option>
-            </select>
-
-            <input type="text" name="race" placeholder="Race" onChange={handleChange} value={personnage.race}/>
-            <input type="text" name="origine" placeholder="Origine" onChange={handleChange} value={personnage.origine}/>
-
-            <input type="number" name="niveau" placeholder="Niveau" onChange={handleChange} value={personnage.niveau}/>
-
-            <select name="tailleCategorie" onChange={handleChange} value={personnage.tailleCategorie}>
-                <option value="">Sélectionnez la Catégorie de Taille</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-                <option value="XXL">XXL</option>
-            </select>
-            <input type="number" name="tailleCm" placeholder="Taille en cm" onChange={handleChange} value={personnage.tailleCm}/>
-
-            {
-                Object.keys(personnage.attributs).map((attribut, index) => (
-                    <div>
-                        <label key={index}>{attribut}</label>
-                        <input
-                            type="number"
-                            name={attribut}
-                            placeholder={attribut}
-                            value={personnage.attributs[attribut]}
-                            onChange={handleChangeAttribut}
-                        />
-                    </div>
-                ))
-            }
-
-            <input type="number" name="quantiteMana" placeholder="Quantité de Mana" onChange={handleChange} />
-            <p> rang : {personnage.rang}</p>
-            <input type="text" name="element1" placeholder="Élément 1" onChange={handleChange} value={personnage.element1}/>
-            <input type="text" name="element2" placeholder="Élément 2" onChange={handleChange}  value={personnage.element2}/>
-            <input type="text" name="element3" placeholder="Élément 3" onChange={handleChange}  value={personnage.element3}/>
-            <input type="text" name="element4" placeholder="Élément 4" onChange={handleChange}  value={personnage.element4}/>
-
-            <input type="text" name="type" placeholder="Type" onChange={handleChange}  value={personnage.type}/>
-
-            <input type="number" name="frequenceOmana" placeholder="frequenceOmana" onChange={handleChange}  value={personnage.frequenceOmana}/>
-
-
-            <input type="text" name="titres" placeholder="Titres" onChange={handleChange}  value={tabToString(personnage.titres)}/>
-            <input type="text" name="benedictions" placeholder="Benedictions" onChange={handleChange} value={tabToString(personnage.benedictions)}/>
-            <input type="text" name="maledictions" placeholder="Maledictions" onChange={handleChange} value={tabToString(personnage.maledictions)}/>
-            <input type="text" name="actives" placeholder="Compétences Actives" onChange={handleChangeCompetences} value={tabToString(personnage.competences.actives)}/>
-            <input type="text" name="passives" placeholder="Compétences Passives" onChange={handleChangeCompetences} value={tabToString(personnage.competences.passives)}/>
-            <input type="text" name="familia" placeholder="Familia" onChange={handleChange} value={personnage.familia} />
-
-            <input type="text" name="principale" placeholder="Guildes Principale" onChange={handleChangeGuildes} value={personnage.guildes.principale}/>
-            <input type="text" name="secondaire" placeholder="Guildes Secondaire" onChange={handleChangeGuildes} value={personnage.guildes.secondaire}/>
-            <input type="text" name="situationFamiliale" placeholder="Situation Familiale" onChange={handleChange} value={personnage.situationFamiliale}/>
-
-            <button type="submit" onClick={handleSubmit}>Ajouter Personnage</button>
+            <div>
+                <Toaster position="top-center" reverseOrder={false} />
+            </div>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="prenom"
+                        label="Prénom"
+                        value={personnage.prenom}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="nom"
+                        label="Nom"
+                        value={personnage.nom}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="autresPrenoms"
+                        label="Autres Prénoms"
+                        value={personnage.autresPrenoms.join(',')}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="autresNoms"
+                        label="Autres Noms"
+                        value={personnage.autresNoms.join(',')}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="alias"
+                        label="Alias"
+                        value={personnage.alias}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="anniversaire"
+                        label="Anniversaire"
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        value={personnage.anniversaire.slice(0, 10)}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Sexe</InputLabel>
+                        <Select
+                            name="sexe"
+                            value={personnage.sexe}
+                            onChange={handleChange}
+                            label="Sexe"
+                        >
+                            <MenuItem value="">
+                                <em>Sélectionnez le Sexe</em>
+                            </MenuItem>
+                            <MenuItem value="H">Homme</MenuItem>
+                            <MenuItem value="F">Femme</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="race"
+                        label="Race"
+                        value={personnage.race}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="origine"
+                        label="Origine"
+                        value={personnage.origine}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="niveau"
+                        label="Niveau"
+                        type="number"
+                        value={personnage.niveau}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Catégorie de Taille</InputLabel>
+                        <Select
+                            name="tailleCategorie"
+                            value={personnage.tailleCategorie}
+                            onChange={handleChange}
+                            label="Catégorie de Taille"
+                        >
+                            <MenuItem value="">
+                                <em>Sélectionnez la Catégorie de Taille</em>
+                            </MenuItem>
+                            <MenuItem value="S">S</MenuItem>
+                            <MenuItem value="M">M</MenuItem>
+                            <MenuItem value="L">L</MenuItem>
+                            <MenuItem value="XL">XL</MenuItem>
+                            <MenuItem value="XXL">XXL</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                {
+                    Object.keys(personnage.attributs).map((attribut, index) => (
+                        <Grid item xs={4} key={index}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                name={attribut}
+                                label={attribut.charAt(0).toUpperCase() + attribut.slice(1)}
+                                type="number"
+                                value={personnage.attributs[attribut]}
+                                onChange={handleChangeAttribut}
+                            />
+                        </Grid>
+                    ))
+                }
+                <Grid item xs={12} style={{ height: '0px' }} />
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="tailleCm"
+                        label="Taille en cm"
+                        type="number"
+                        value={personnage.tailleCm}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="quantiteMana"
+                        label="Quantité de Mana"
+                        type="number"
+                        value={personnage.quantiteMana}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="rang"
+                        label="Rang"
+                        value={personnage.rang}
+                        InputLabelProps={{ shrink: true }}
+                        disabled
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="element1"
+                        label="Élément 1"
+                        value={personnage.element1}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="element2"
+                        label="Élément 2"
+                        value={personnage.element2}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="element3"
+                        label="Élément 3"
+                        value={personnage.element3}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="element4"
+                        label="Élément 4"
+                        value={personnage.element4}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="type"
+                        label="Type"
+                        value={personnage.type}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="frequenceOmana"
+                        label="Fréquence Omana"
+                        type="number"
+                        value={personnage.frequenceOmana}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="titres"
+                        label="Titres"
+                        value={personnage.titres.join(',')}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="benedictions"
+                        label="Benedictions"
+                        value={personnage.benedictions.join(',')}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="maledictions"
+                        label="Maledictions"
+                        value={personnage.maledictions.join(',')}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="actives"
+                        label="Compétences Actives"
+                        value={personnage.competences.actives.join(',')}
+                        onChange={handleChangeCompetences}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="passives"
+                        label="Compétences Passives"
+                        value={personnage.competences.passives.join(',')}
+                        onChange={handleChangeCompetences}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="familia"
+                        label="Familia"
+                        value={personnage.familia}
+                        onChange={handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="principale"
+                        label="Guildes Principale"
+                        value={personnage.guildes.principale}
+                        onChange={handleChangeGuildes}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="secondaire"
+                        label="Guildes Secondaire"
+                        value={personnage.guildes.secondaire}
+                        onChange={handleChangeGuildes}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="situationFamiliale"
+                        label="Situation Familiale"
+                        value={personnage.situationFamiliale}
+                        onChange={handleChange}
+                    />
+                </Grid>
+            </Grid>
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
+                Ajouter Personnage
+            </Button>
         </form>
     );
 };

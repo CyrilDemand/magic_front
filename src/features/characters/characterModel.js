@@ -30,7 +30,7 @@ export const characterModel = {
     element4: '',
     type: '',
     frequenceOmana: 0,
-    rang: '',
+    rang: 'G-',
     titres: [''],
     competences: {
         actives: [''],
