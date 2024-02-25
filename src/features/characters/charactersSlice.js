@@ -18,7 +18,6 @@ export const charactersSlice = createSlice({
             })
             .addCase(fetchCharacters.fulfilled, (state, action) => {
                 state.loading = 'succeeded';
-                console.log(action.payload);
                 state.characters = action.payload;
             })
             .addCase(fetchCharacters.rejected, (state, action) => {
