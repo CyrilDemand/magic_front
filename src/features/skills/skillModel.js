@@ -7,5 +7,6 @@ export const skillModel = {
     classe: '',
     rang: '',
     type: '',
-    coutEnMana: ''
+    coutEnMana: '',
+    actif: true
 }

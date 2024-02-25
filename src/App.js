@@ -22,21 +22,6 @@ function App() {
     return (
         <div>
             <Header setShowCharacters={setShowCharacters}/>
-            {/*<nav>
-                <ul>
-                    <li>
-                        <Link to="/">Accueil</Link>
-                    </li>
-                    <li>
-                        {/* Appel de la méthode lorsque le lien est cliqué
-                        <Link to="/character">ajouter un personnage</Link>
-                    </li>
-                    <li>
-                        <Link to="/skill">ajouter une compétence</Link>
-                    </li>
-                </ul>
-            </nav>*/}
-
             <Routes>
                 <Route path="/" element={<HomePage
                     showCharacters={showCharacters}

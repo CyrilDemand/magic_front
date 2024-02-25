@@ -5,6 +5,7 @@ import {skillModel} from "../features/skills/skillModel";
 import {useDispatch, useSelector} from "react-redux";
 import {selectSkillById} from "../features/skills/skillsSlice";
 import {addSkills} from "../api/skillsApi";
+import { Grid, TextField, Button, FormControl, InputLabel, Select, MenuItem, Switch, FormGroup, FormControlLabel } from '@mui/material';
 
 const FormCompetence = () => {
     const [title, setTitle] = useState('Ajouter une compétence');
@@ -15,12 +16,15 @@ const FormCompetence = () => {
 
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, checked } = e.target;
+        const newValue = name === "actif" ? checked : value;
         setSkill(prevState => ({
             ...prevState,
-            [name]: value
+            [name]: newValue
         }));
     };
+
+
 
     useEffect(() => {
         if (skillById) {
@@ -28,9 +32,9 @@ const FormCompetence = () => {
             setTitle('Modifier compétence : ' + skillModel.nomDeCompetence);
         } else {
             setSkill(skillModel); // Réinitialise le formulaire si aucun ID ou personnage non trouvé
-            setTitle('Ajouter Personnage');
+            setTitle('Ajouter une compétence');
         }
-    }, [id, skill]);
+    }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,79 +43,137 @@ const FormCompetence = () => {
     return (
         <form onSubmit={handleSubmit}>
             <h1>{title}</h1>
-            <input
-                type="text"
-                name="nomDeCompetence"
-                value={skill.nomDeCompetence}
-                onChange={handleChange}
-                placeholder="Nom de Compétence"
-                required
-            />
-            <textarea
-                name="description"
-                value={skill.description}
-                onChange={handleChange}
-                placeholder="Description"
-                required
-            />
-            <input
-                type="number"
-                name="tier"
-                value={skill.tier}
-                onChange={handleChange}
-                placeholder="Tier (1 à 15)"
-                min="1"
-                max="15"
-                required
-            />
-            <select name="familleDeMagie" onChange={handleChange} value={skill.familleDeMagie} required>
-                <option value="">Sélectionnez la famille de magie</option>
-                <option value="élémentaire">élémentaire</option>
-                <option value="Ethérée">Ethérée</option>
-                <option value="Réaliste">Réaliste</option>
-                <option value="Surréaliste">Surréaliste</option>
-            </select>
-            <input
-                type="text"
-                name="element"
-                value={skill.element}
-                onChange={handleChange}
-                placeholder="Élément"
-                disabled={skill.familleDeMagie === ''}
-            />
-            <input
-                type="text"
-                name="classe"
-                value={skill.classe}
-                onChange={handleChange}
-                placeholder="Classe"
-                required
-            />
-            <input
-                type="text"
-                name="rang"
-                value={skill.rang}
-                onChange={handleChange}
-                placeholder="Rang"
-                required
-            />
-            <input
-                type="text"
-                name="type"
-                value={skill.type}
-                onChange={handleChange}
-                placeholder="Type"
-                required
-            />
-            <input
-                type="number"
-                name="coutEnMana"
-                value={skill.coutEnMana}
-                onChange={handleChange}
-                placeholder="Coût en Mana"
-                required
-            />
-            <button type="submit" onClick={handleSubmit}>ajouter</button>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="nomDeCompetence"
+                        label="Nom de Compétence"
+                        value={skill.nomDeCompetence}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="description"
+                        label="Description"
+                        value={skill.description}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="tier"
+                        label="Tier (1 à 15)"
+                        type="number"
+                        value={skill.tier}
+                        onChange={handleChange}
+                        inputProps={{ min: "1", max: "15" }}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Famille de Magie</InputLabel>
+                        <Select
+                            name="familleDeMagie"
+                            value={skill.familleDeMagie}
+                            onChange={handleChange}
+                            label="Famille de Magie"
+                            required
+                        >
+                            <MenuItem value="">Sélectionnez la famille de magie</MenuItem>
+                            <MenuItem value="élémentaire">élémentaire</MenuItem>
+                            <MenuItem value="Ethérée">Ethérée</MenuItem>
+                            <MenuItem value="Réaliste">Réaliste</MenuItem>
+                            <MenuItem value="Surréaliste">Surréaliste</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="element"
+                        label="Élément"
+                        value={skill.element}
+                        onChange={handleChange}
+                        disabled={skill.familleDeMagie === ''}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="classe"
+                        label="Classe"
+                        value={skill.classe}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="rang"
+                        label="Rang"
+                        value={skill.rang}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="type"
+                        label="Type"
+                        value={skill.type}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        name="coutEnMana"
+                        label="Coût en Mana"
+                        type="number"
+                        value={skill.coutEnMana}
+                        onChange={handleChange}
+                        required
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <FormControl component="fieldset">
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={skill.actif}
+                                        onChange={handleChange}
+                                        name="actif"
+                                        color="primary"
+                                    />
+                                }
+                                label={skill.actif ? "La compétence est active" : "La compétence est passive"}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Grid>
+            </Grid>
+            <Button variant="contained" color="primary" type="submit">
+                Ajouter
+            </Button>
         </form>
     );
 };
